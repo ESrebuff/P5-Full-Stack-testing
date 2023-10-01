@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -119,6 +118,24 @@ public class SessionServiceTest {
 
         // THEN
         assertThat(retrievedSession).isEqualTo(expectedSession);
+    }
+
+    @Test
+    public void testGetSessionById_SessionNotFound() {
+        // GIVEN
+        // Create a mock session with a specific ID for the test
+        Long sessionId = 1L;
+        Session expectedSession = new Session();
+        expectedSession.setId(sessionId);
+
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(expectedSession));
+
+        // WHEN
+        // Call the getById method with the specific ID
+        Session retrievedSession = sessionService.getById(2L);
+
+        // THEN
+        assertThat(retrievedSession).isNotEqualTo(expectedSession);
     }
 
     @Test
