@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import com.openclassrooms.starterjwt.dto.SessionDto;
 import com.openclassrooms.starterjwt.mapper.SessionMapper;
 import com.openclassrooms.starterjwt.models.Session;
-import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.services.SessionService;
 
 public class SessionControllerTest {

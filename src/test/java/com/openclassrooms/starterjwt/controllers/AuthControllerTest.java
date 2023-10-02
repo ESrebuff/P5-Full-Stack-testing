@@ -1,51 +1,109 @@
 package com.openclassrooms.starterjwt.controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.payload.request.LoginRequest;
 import com.openclassrooms.starterjwt.payload.request.SignupRequest;
+import com.openclassrooms.starterjwt.payload.response.JwtResponse;
 import com.openclassrooms.starterjwt.repository.UserRepository;
+import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
+import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 public class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private AuthController authController;
 
-    @MockBean
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private JwtUtils jwtUtils;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
     @Test
-    public void testRegisterUser_SuccessfulRegistration() throws Exception {
-        String requestBody = "{\"email\":\"test@example.com\",\"password\":\"password\",\"firstName\":\"Test\",\"lastName\":\"Example\"}";
+    public void testAuthenticateUser_ValidLogin() {
+        // GIVEN
+        // Mock input
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@example.com");
+        loginRequest.setPassword("password");
 
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenReturn(new User());
+        // Mock authentication
+        Authentication authentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-        assertEquals(200, result.getResponse().getStatus());
+        // Mock UserDetails
+        UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+
+        // Mock UserRepository
+        User user = mock(User.class);
+        when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
+        when(user.isAdmin()).thenReturn(false);
+
+        // Mock JWT token
+        when(jwtUtils.generateJwtToken(authentication)).thenReturn("testToken");
+
+        // WHEN
+        ResponseEntity<?> response = authController.authenticateUser(loginRequest);
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isInstanceOf(JwtResponse.class);
+        JwtResponse jwtResponse = (JwtResponse) response.getBody();
+        if (jwtResponse != null) {
+            assertThat(jwtResponse.getToken()).isEqualTo("testToken");
+        } else {
+            throw new AssertionError("jwtResponse is null");
+        }
+    }
+
+    @Test
+    public void testRegisterUser_SuccessfulRegistration() {
+        // GIVEN
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setEmail("test@example.com");
+        signupRequest.setPassword("password");
+        signupRequest.setFirstName("Test");
+        signupRequest.setLastName("Example");
+
+        // Mock UserRepository
+        when(userRepository.existsByEmail(signupRequest.getEmail())).thenReturn(false);
+
+        // Mock PasswordEncoder
+        when(passwordEncoder.encode(signupRequest.getPassword())).thenReturn("hashedPassword");
+
+        // WHEN
+        ResponseEntity<?> response = authController.registerUser(signupRequest);
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 }
