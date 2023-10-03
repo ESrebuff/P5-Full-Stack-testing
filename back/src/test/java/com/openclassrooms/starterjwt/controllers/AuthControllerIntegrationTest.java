@@ -1,6 +1,6 @@
 package com.openclassrooms.starterjwt.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class AuthControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andReturn();
-        assertEquals(200, result.getResponse().getStatus());
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
     }
 
     @Test
@@ -45,6 +45,6 @@ public class AuthControllerIntegrationTest {
                 .content(requestBody))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertEquals(200, result.getResponse().getStatus());
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
     }
 }
