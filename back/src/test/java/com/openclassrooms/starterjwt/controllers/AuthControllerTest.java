@@ -22,7 +22,9 @@ import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class AuthControllerTest {
@@ -105,5 +107,20 @@ public class AuthControllerTest {
 
         // THEN
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void testRegisterUser_EmailAlreadyTaken() {
+        // GIVEN
+        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setEmail("yoga@studio.com");
+
+        // WHEN
+        ResponseEntity<?> response = authController.registerUser(signupRequest);
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

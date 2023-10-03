@@ -1,6 +1,7 @@
 package com.openclassrooms.starterjwt.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -142,6 +143,18 @@ public class SessionControllerTest {
     }
 
     @Test
+    public void testUpdate_InvalidId() {
+        // GIVEN
+        String invalidId = "invalid"; // An invalid non-numeric id
+
+        // WHEN
+        ResponseEntity<?> response = sessionController.update(invalidId, new SessionDto());
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     public void testSave() {
         // GIVEN
         Long sessionId = 1L;
@@ -160,6 +173,18 @@ public class SessionControllerTest {
     }
 
     @Test
+    public void testSave_InvalidId() {
+        // GIVEN
+        String invalidId = "invalid"; // An invalid non-numeric id
+
+        // WHEN
+        ResponseEntity<?> response = sessionController.save(invalidId);
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     public void testParticipate() {
         // GIVEN
         Long sessionId = 1L;
@@ -174,6 +199,19 @@ public class SessionControllerTest {
     }
 
     @Test
+    public void testParticipate_InvalidId() {
+        // GIVEN
+        Long userId = 2L;
+        String invalidId = "invalid"; // An invalid non-numeric id
+
+        // WHEN
+        ResponseEntity<?> response = sessionController.participate(invalidId, userId.toString());
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     public void testNoLongerParticipate() {
         // GIVEN
         Long sessionId = 1L;
@@ -185,6 +223,19 @@ public class SessionControllerTest {
         // THEN
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         verify(sessionService).noLongerParticipate(sessionId, userId);
+    }
+
+    @Test
+    public void testNoLongerParticipate_InvalidId() {
+        // GIVEN
+        Long userId = 2L;
+        String invalidId = "invalid"; // An invalid non-numeric id
+
+        // WHEN
+        ResponseEntity<?> response = sessionController.noLongerParticipate(invalidId, userId.toString());
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 }

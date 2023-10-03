@@ -2,6 +2,7 @@ package com.openclassrooms.starterjwt.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,6 +59,34 @@ public class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(mockUserDto, response.getBody());
     }
+     
+    @Test
+    public void testFindById_NotFound() {
+        // GIVEN
+        Long userId = 1L;
+
+        when(userService.findById(userId)).thenReturn(null);
+
+        // WHEN
+        ResponseEntity<?> response = userController.findById(userId.toString());
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        verify(userService).findById(userId);
+    }
+
+    @Test
+    public void testFindById_InvalidId() {
+        // GIVEN
+        String invalidId = "invalid";
+        when(userService.findById(anyLong())).thenThrow(NumberFormatException.class);
+
+        // WHEN
+        ResponseEntity<?> response = userController.findById(invalidId);
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 
     @Test
     public void testSave_UserFoundAndAuthorized_DeletesUser() {
@@ -89,5 +118,28 @@ public class UserControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         verify(userService).findById(userId);
         verify(userService).delete(userId);
+    }
+
+    @Test
+    public void testSave_InvalidId() {
+        // GIVEN
+        String invalidId = "invalid";
+        SecurityContextHolder.setContext(new SecurityContext() {
+            @Override
+            public Authentication getAuthentication() {
+                return null;
+            }
+
+            @Override
+            public void setAuthentication(Authentication authentication) {
+
+            }
+        });
+
+        // WHEN
+        ResponseEntity<?> response = userController.save(invalidId);
+
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

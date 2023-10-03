@@ -1,6 +1,5 @@
 package com.openclassrooms.starterjwt.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
