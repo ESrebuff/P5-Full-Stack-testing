@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-describe('all e2e tests', () => {
+describe('all e2e', () => {
   it('Not Found successfull', () => {
     cy.visit('/random');
     cy.url().should('include', '/404');
