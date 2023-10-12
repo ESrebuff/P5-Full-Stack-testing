@@ -12,6 +12,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.openclassrooms.starterjwt.payload.response.JwtResponse;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,4 +50,22 @@ public class AuthControllerIntegrationTest {
                 .andReturn();
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
     }
+
+    @Test
+    public void testRegisterUser_EmailAlreadyTaken() throws Exception {
+        // Create a JSON request body with an email that is already in the database
+        String requestBody = "{\"email\":\"yoga@studio.com\",\"password\":\"password\",\"firstName\":\"Test\",\"lastName\":\"Example\"}";
+
+        // Perform an HTTP POST request to the /api/auth/register endpoint with the JSON
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest()) // Expecting a bad request
+                .andReturn();
+
+        // Check if the response body contains the expected error message
+        String responseContent = result.getResponse().getContentAsString();
+        assertThat(responseContent).contains("Error: Email is already taken!");
+    }
+
 }
