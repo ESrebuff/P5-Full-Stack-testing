@@ -1,10 +1,10 @@
 # Yoga back
 ## Requirements
-* Software 
+Software 
 > java 8
 > MySQL
 > maven
-* Test Library
+Test Library
 > JUnit
 > Jacoco
 
