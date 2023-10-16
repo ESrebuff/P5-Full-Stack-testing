@@ -12,7 +12,9 @@ Test Library
 
 ## Setup
 > Launch a MySQL Server.
+
 > Execute "ressources/sql/script.sql" .
+
 > Edit the file "back/src/main/resources/application.properties" with your database credentials
 
 
