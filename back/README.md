@@ -1,12 +1,12 @@
 # Yoga back
 ## Requirements
 Software 
-> java 8
-> MySQL
-> maven
+- java 8
+- MySQL
+- maven
 Test Library
-> JUnit
-> Jacoco
+- JUnit
+- Jacoco
 
 ## Setup
 > Launch a MySQL Server.
