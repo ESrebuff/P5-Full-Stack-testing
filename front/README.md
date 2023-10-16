@@ -1,4 +1,4 @@
-# Yoga
+# Yoga front
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.1.0.
 
@@ -8,9 +8,9 @@ Git clone:
 
 > git clone https://github.com/OpenClassrooms-Student-Center/P5-Full-Stack-testing
 
-Go inside folder:
+Go inside the front folder:
 
-> cd yoga
+> cd P5-Full-Stack-testing/front
 
 Install dependencies:
 
